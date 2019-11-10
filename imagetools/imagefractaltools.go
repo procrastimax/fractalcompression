@@ -8,33 +8,52 @@ import (
 
 const iterations = 1
 
-func CreateFractalFromImage(img *image.Gray) *image.Gray {
-	for i := 0; i < iterations; i++ {
-		img = applyIFSToImage(img, 0.5, 0, 0, 0.5, 0, 0)
-		img = applyIFSToImage(img, 0.5, 0, 0, 0.5, 0.5, 0)
-		img = applyIFSToImage(img, 0.5, 0, 0, 0.5, 0, 0.5)
+// Transformation is a struct to describe a ISF transformation
+type Transformation struct {
+	A, B, C, D, E, F float64
+}
+
+// CreateFractalFromImage is a Function to create fractal from ISF
+func CreateFractalFromImage(img *image.Gray, numberOfIterations int, transformations []Transformation) *image.Gray {
+
+	for i := 0; i < numberOfIterations; i++ {
+		applyIFSToImage(img, transformations)
 	}
 	return img
 }
 
-func applyIFSToImage(img *image.Gray, a float64, b float64, c float64, d float64, e float64, f float64) *image.Gray {
+func applyIFSToImage(img *image.Gray, transformations []Transformation) *image.Gray {
 
-	// a b  * x  + e
-	// c d  * y  + f
+	// (a b)  * (x)  + (e)
+	// (c d)  * (y)  + (f)
 
-	rect := img.Bounds()
+	imgMatrix := make([][]uint8, img.Stride)
+	for i := 0; i < len(imgMatrix); i++ {
+		imgMatrix[i] = make([]uint8, len(img.Pix)/img.Stride)
+	}
 
-	for x := 0; x < rect.Dx(); x++ {
-		for y := 0; y < rect.Dy(); y++ {
-			grayValue := color.GrayModel.Convert(img.At(x, y)).(color.Gray)
-			//reset color at visited pixel
-			//img.SetGray(x, y, color.Gray{255})
-			//set this gray value on a transformed position
-			var newX int = int(math.Round(a*float64(x) + b*float64(y) + e*float64(rect.Dx())))
-			var newY int = int(math.Round(c*float64(x) + d*float64(y) + f*float64(rect.Dy())))
-
-			img.SetGray(newX, newY, grayValue)
+	//fill img Matrix with 0 values
+	var x, y int = 0, 0
+	for i := 0; i < len(img.Pix); i++ {
+		imgMatrix[x%img.Stride][y] = img.Pix[i]
+		//make all pixel blank
+		img.Pix[i] = 255
+		x++
+		if x%img.Stride == 0 {
+			y++
 		}
 	}
+
+	for i := 0; i < len(transformations); i++ {
+		for x := 0; x < len(imgMatrix); x++ {
+			for y := 0; y < len(imgMatrix[x]); y++ {
+				grayValue := imgMatrix[x][y]
+				var newX int = int(math.Round(transformations[i].A*float64(x) + transformations[i].B*float64(y) + transformations[i].E*float64(img.Rect.Dx())))
+				var newY int = int(math.Round(transformations[i].C*float64(x) + transformations[i].D*float64(y) + transformations[i].F*float64(img.Rect.Dy())))
+				img.SetGray(newX, newY, color.Gray{Y: grayValue})
+			}
+		}
+	}
+
 	return img
 }
