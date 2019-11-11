@@ -26,15 +26,14 @@ func main() {
 
 	//*grayImg = imagetools.FlipImage(grayImg)
 
-	imgCopy := imagetools.FlipImage(grayImg)
+	//imgCopy := imagetools.FlipImage(grayImg)
+	imgCopy := imagetools.RotateImage(grayImg, 0)
 
 	//grayImg = imagetools.CreateFractalFromImage(grayImg, 10, []imagetools.Transformation{transformation1, transformation2, transformation3})
 
 	//fmt.Println("Image successfully fractalized...")
 
 	imagetools.SaveImageToFile(imgCopy, filename)
-
-	imagetools.SaveImageToFile(grayImg, "images/filename.jpg")
 
 	fmt.Println("Image successfully saved...")
 }
