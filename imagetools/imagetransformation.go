@@ -4,7 +4,6 @@ import (
 	"image"
 	"image/color"
 	"log"
-	"math"
 )
 
 //FlipImage flips the image vertically by providing a pointer to an image and returning normal image.Gray struct
@@ -79,10 +78,20 @@ func RotateImage(img *image.Gray, rotationType uint8) *image.Gray {
 	return imgCopy
 }
 
-func degToRad(rotation int16) float64 {
-	return float64(rotation) * float64(math.Pi/180.0)
-}
+// DivideImage slices an image into pixelSize*pixelSize smaller images and returning them in an array
+func DivideImage(img *image.Gray, pixelSize int) [][]*image.Gray {
 
-func radToDeg(radians float64) int {
-	return int(radians * (180.0 / math.Pi))
+	// how many new smaller images are being created per axis
+	var dividedCount int = img.Rect.Dx() / int(pixelSize)
+
+	imageParts := make([][]*image.Gray, dividedCount)
+
+	for i := 0; i < dividedCount; i++ {
+		imageParts[i] = make([]*image.Gray, dividedCount)
+		for j := 0; j < dividedCount; j++ {
+			rect := image.Rect(i*pixelSize, j*pixelSize, (pixelSize*i)+pixelSize, (pixelSize*j)+pixelSize)
+			imageParts[i][j] = img.SubImage(rect).(*image.Gray)
+		}
+	}
+	return imageParts
 }

@@ -22,16 +22,11 @@ func main() {
 
 	fmt.Println("Image successfully turned gray...")
 
-	fmt.Println("Flipping image")
+	fmt.Println("Creating range and domain arrays...")
+	ranges := imagetools.DivideImage(grayImg, 4)
+	domains := imagetools.DivideImage(grayImg, 8)
 
-	//imgCopy := imagetools.FlipImage(grayImg)
-	//imgCopy := imagetools.RotateImage(grayImg, 0)
-
-	imgCopy := imagetools.CreateFractalFromImage(grayImg, 7, []imagetools.Transformation{transformation1, transformation2, transformation3})
-
-	//fmt.Println("Image successfully fractalized...")
-
-	imagetools.SaveImageToFile(imgCopy, filename)
+	//imagetools.SaveImageToFile(imgCopy, filename)
 
 	fmt.Println("Image successfully saved...")
 }
