@@ -32,7 +32,7 @@ func main() {
 
 	//fmt.Println("Image successfully fractalized...")
 
-	imagetools.SaveImageToFile(&imgCopy, filename)
+	imagetools.SaveImageToFile(imgCopy, filename)
 
 	imagetools.SaveImageToFile(grayImg, "images/filename.jpg")
 

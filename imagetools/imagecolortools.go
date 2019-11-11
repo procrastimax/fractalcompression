@@ -3,9 +3,9 @@ package imagetools
 import (
 	"image"
 	"image/color"
-	_ "image/jpeg"
 )
 
+//ImageToGray takes an image.Image pointer and returns it as image.Gray
 func ImageToGray(img *image.Image) *image.Gray {
 	size := (*img).Bounds().Size()
 	rect := image.Rect(0, 0, size.X, size.Y)
@@ -19,6 +19,7 @@ func ImageToGray(img *image.Image) *image.Gray {
 	return newImg
 }
 
+//ImageToBW takes an image.Image pointer and return it as image.Gray where only pixelvalues of 0 and 255 are allowed (only black and white)
 func ImageToBW(img *image.Image) *image.Gray {
 	size := (*img).Bounds().Size()
 	rect := image.Rect(0, 0, size.X, size.Y)
