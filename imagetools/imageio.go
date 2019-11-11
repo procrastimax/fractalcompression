@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	_ "image/jpeg"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,6 +16,7 @@ func check(err error) {
 	}
 }
 
+// LoadImageFromFile returns a pointer to an image.Image by providing a filename
 func LoadImageFromFile(filename string) *image.Image {
 	if len(strings.TrimSpace(filename)) == 0 {
 		log.Fatalln("Image path shall not be null or empty!")
@@ -33,6 +33,7 @@ func LoadImageFromFile(filename string) *image.Image {
 	return &img
 }
 
+// SaveImageToFile saves a i*mg.Gray pointer to the specified filename with the *_edited* filepostix
 func SaveImageToFile(img *image.Gray, filename string) {
 	if len(strings.TrimSpace(filename)) == 0 {
 		log.Fatalln("Image path shall not be null or empty!")

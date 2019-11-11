@@ -7,6 +7,38 @@ import (
 	"os"
 )
 
+func main() {
+	if len(os.Args) < 2 {
+		log.Fatalln("Please specify an imagepath!")
+	}
+	filename := os.Args[1]
+
+	fmt.Println("Loading image and convert to fractal...")
+	img := imagetools.LoadImageFromFile(filename)
+
+	fmt.Println("Loading successfull...")
+
+	grayImg := imagetools.ImageToGray(img)
+
+	fmt.Println("Image successfully turned gray...")
+
+	fmt.Println("Flipping image")
+
+	//*grayImg = imagetools.FlipImage(grayImg)
+
+	imgCopy := imagetools.FlipImage(grayImg)
+
+	//grayImg = imagetools.CreateFractalFromImage(grayImg, 10, []imagetools.Transformation{transformation1, transformation2, transformation3})
+
+	//fmt.Println("Image successfully fractalized...")
+
+	imagetools.SaveImageToFile(&imgCopy, filename)
+
+	imagetools.SaveImageToFile(grayImg, "images/filename.jpg")
+
+	fmt.Println("Image successfully saved...")
+}
+
 //Sierpinski Triangle
 var transformation1 = imagetools.Transformation{
 	A: 0.5,
@@ -71,27 +103,3 @@ var transformation4 = imagetools.Transformation{
 	E: 0.5,
 	F: 0.5,
 }*/
-
-func main() {
-	if len(os.Args) < 2 {
-		log.Fatalln("Please specify an imagepath!")
-	}
-	filename := os.Args[1]
-
-	fmt.Println("Loading image and convert to fractal...")
-	img := imagetools.LoadImageFromFile(filename)
-
-	fmt.Println("Loading successfull...")
-
-	grayImg := imagetools.ImageToGray(img)
-
-	fmt.Println("Image successfully turned gray...")
-
-	grayImg = imagetools.CreateFractalFromImage(grayImg, 10, []imagetools.Transformation{transformation1, transformation2, transformation3})
-
-	fmt.Println("Image successfully fractalized...")
-
-	imagetools.SaveImageToFile(grayImg, filename)
-
-	fmt.Println("Image successfully saved...")
-}
