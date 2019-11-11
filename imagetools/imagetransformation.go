@@ -95,3 +95,40 @@ func DivideImage(img *image.Gray, pixelSize int) [][]*image.Gray {
 	}
 	return imageParts
 }
+
+//ScaleImage scales a given image pointer by *scalingFactor* and returns the result
+//Use only scalingFactor <= 1 and > 0!
+func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
+	if scalingFactor > 1 || scalingFactor <= 0 {
+		log.Fatalln("Scaling Factor has to be greater than 0 and less or equal 1!")
+	}
+
+	// make deep copy of passed image
+	imgCopy := image.NewGray(image.Rect(
+		int(float64(img.Rect.Min.X)*scalingFactor),
+		int(float64(img.Rect.Min.Y)*scalingFactor),
+		int(float64(img.Rect.Max.X)*scalingFactor),
+		int(float64(img.Rect.Max.Y)*scalingFactor)))
+
+	for i := range imgCopy.Pix {
+		imgCopy.Pix[i] = 0
+	}
+
+	var x = 0
+	var y = 0
+	var newX = 0
+	var newY = 0
+	var grayValue = color.Gray{Y: 0}
+
+	for i := range img.Pix {
+		x = (i % img.Stride)
+		y = (i / img.Stride)
+
+		newX = int(float64(x) * scalingFactor)
+		newY = int(float64(y) * scalingFactor)
+
+		grayValue = img.GrayAt(x, y)
+		imgCopy.SetGray(newX, newY, grayValue)
+	}
+	return imgCopy
+}

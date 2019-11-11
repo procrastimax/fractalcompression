@@ -23,10 +23,12 @@ func main() {
 	fmt.Println("Image successfully turned gray...")
 
 	fmt.Println("Creating range and domain arrays...")
-	ranges := imagetools.DivideImage(grayImg, 4)
-	domains := imagetools.DivideImage(grayImg, 8)
+	//ranges := imagetools.DivideImage(grayImg, 4)
+	domains := imagetools.DivideImage(grayImg, 8)[1][0]
 
-	//imagetools.SaveImageToFile(imgCopy, filename)
+	grayImg = imagetools.ScaleImage(domains, 1)
+
+	imagetools.SaveImageToFile(grayImg, filename)
 
 	fmt.Println("Image successfully saved...")
 }
