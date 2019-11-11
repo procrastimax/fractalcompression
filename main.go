@@ -24,12 +24,10 @@ func main() {
 
 	fmt.Println("Flipping image")
 
-	//*grayImg = imagetools.FlipImage(grayImg)
-
 	//imgCopy := imagetools.FlipImage(grayImg)
-	imgCopy := imagetools.RotateImage(grayImg, 0)
+	//imgCopy := imagetools.RotateImage(grayImg, 0)
 
-	//grayImg = imagetools.CreateFractalFromImage(grayImg, 10, []imagetools.Transformation{transformation1, transformation2, transformation3})
+	imgCopy := imagetools.CreateFractalFromImage(grayImg, 7, []imagetools.Transformation{transformation1, transformation2, transformation3})
 
 	//fmt.Println("Image successfully fractalized...")
 
