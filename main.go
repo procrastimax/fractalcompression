@@ -24,13 +24,17 @@ func main() {
 
 	fmt.Println("Creating range and domain arrays...")
 	//ranges := imagetools.DivideImage(grayImg, 4)
-	domains := imagetools.DivideImage(grayImg, 8)[1][0]
+	domains := imagetools.DivideImage(grayImg, 8)
 
-	grayImg = imagetools.ScaleImage(domains, 1)
+	fmt.Println("Scale down all domains to range-block size...")
+	for i := range domains {
+		for _, value := range domains[i] {
+			value = imagetools.ScaleImage(value, 0.5)
+		}
+	}
 
-	imagetools.SaveImageToFile(grayImg, filename)
-
-	fmt.Println("Image successfully saved...")
+	//imagetools.SaveImageToFile(grayImg, filename)
+	//fmt.Println("Image successfully saved...")
 }
 
 //Sierpinski Triangle

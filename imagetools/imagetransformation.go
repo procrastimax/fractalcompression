@@ -99,36 +99,43 @@ func DivideImage(img *image.Gray, pixelSize int) [][]*image.Gray {
 //ScaleImage scales a given image pointer by *scalingFactor* and returns the result
 //Use only scalingFactor <= 1 and > 0!
 func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
-	if scalingFactor > 1 || scalingFactor <= 0 {
-		log.Fatalln("Scaling Factor has to be greater than 0 and less or equal 1!")
+	if scalingFactor > 0.5 || scalingFactor <= 0 {
+		log.Fatalln("Scaling Factor has to be greater than 0 and less or equal than 0.5! Scaling values abore 0.5 are currently not implemented...")
 	}
+
+	//pixel averaging -> explanation see following link:
+	//https://entropymine.com/imageworsener/pixelmixing/
+
+	//tileCount is the new value of D.x() and D.y()
+	tileCount := int(float64(img.Stride) * scalingFactor)
 
 	// make deep copy of passed image
-	imgCopy := image.NewGray(image.Rect(
-		int(float64(img.Rect.Min.X)*scalingFactor),
-		int(float64(img.Rect.Min.Y)*scalingFactor),
-		int(float64(img.Rect.Max.X)*scalingFactor),
-		int(float64(img.Rect.Max.Y)*scalingFactor)))
+	imgCopy := image.NewGray(image.Rect(0, 0, tileCount, tileCount))
+	imgCopy = img
 
-	for i := range imgCopy.Pix {
-		imgCopy.Pix[i] = 0
-	}
+	//pixelBox is the value of pixel inside a tile on the original image
+	pixelCount := img.Stride / imgCopy.Stride
 
 	var x = 0
 	var y = 0
-	var newX = 0
-	var newY = 0
-	var grayValue = color.Gray{Y: 0}
+	var grayValue = color.Gray{Y: 255}
+	var grayInt = 0
 
-	for i := range img.Pix {
-		x = (i % img.Stride)
-		y = (i / img.Stride)
+	//iterave over every pixel of the new image and set the gray value as an average value from the old image
+	for i := range imgCopy.Pix {
+		grayInt = 0
+		x = (i % imgCopy.Stride)
+		y = (i / imgCopy.Stride)
 
-		newX = int(float64(x) * scalingFactor)
-		newY = int(float64(y) * scalingFactor)
+		for a := 0; a < pixelCount; a++ {
+			for b := 0; b < pixelCount; b++ {
+				grayInt += int(img.GrayAt((pixelCount*x)+a, (pixelCount*y)+b).Y)
+			}
+		}
 
-		grayValue = img.GrayAt(x, y)
-		imgCopy.SetGray(newX, newY, grayValue)
+		//average grayValue
+		grayValue.Y = uint8(grayInt / (pixelCount * pixelCount))
+		imgCopy.SetGray(x, y, grayValue)
 	}
-	return imgCopy
+	return img
 }
