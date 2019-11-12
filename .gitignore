@@ -12,5 +12,5 @@
 *.out
 
 .vscode
-images/*_edited.jpeg
-images/*_edited.jpg
+images/*edited.jpeg
+images/*edited.jpg
