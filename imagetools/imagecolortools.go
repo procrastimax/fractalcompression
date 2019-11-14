@@ -39,3 +39,15 @@ func ImageToBW(img *image.Image) *image.Gray {
 	}
 	return newImg
 }
+
+//calcAverageGrayLevel iterates over all pixel in the image and calcuates the average gray level
+func calcAverageGrayLevel(img *image.Gray) uint8 {
+	var grayValue int = 0
+	var x, y = 0, 0
+	for i := range img.Pix {
+		x = i % img.Stride
+		y = i / img.Stride
+		grayValue += int(img.GrayAt(x, y).Y)
+	}
+	return uint8(grayValue / len(img.Pix))
+}
