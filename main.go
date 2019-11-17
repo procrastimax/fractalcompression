@@ -22,7 +22,8 @@ func main() {
 
 	fmt.Println("Image successfully turned gray...")
 
-	grayImg = imagetools.CreateFractalFromImage(grayImg, 1, []imagetools.Transformation{transformation1, transformation2, transformation3})
+	grayImg = imagetools.TransformImage(grayImg, 7)
+	//grayImg = imagetools.CreateFractalFromImage(grayImg, 1, []imagetools.Transformation{transformation1, transformation2, transformation3})
 
 	//fmt.Println("Creating range and domain arrays...")
 	//ranges := imagetools.DivideImage(grayImg, 4)

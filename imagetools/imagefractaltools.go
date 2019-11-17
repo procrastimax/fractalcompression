@@ -31,15 +31,18 @@ func applyIFSToImage(img *image.Gray, transformations []Transformation) *image.G
 	for i := 0; i < len(imgCopy.Pix); i++ {
 		imgCopy.Pix[i] = 255
 	}
-
+	var x = 0
+	var y = 0
+	var newX = 0
+	var newY = 0
 	for i := 0; i < len(transformations); i++ {
 		for j := 0; j < len(imgCopy.Pix); j++ {
-			var x = j % img.Stride
-			var y = j / img.Stride
+			x = j % img.Stride
+			y = j / img.Stride
 			grayValue := img.GrayAt(x, y)
 
-			var newX int = int(math.Round(transformations[i].A*float64(x) + transformations[i].B*float64(y) + transformations[i].E*float64(img.Rect.Dx())))
-			var newY int = int(math.Round(transformations[i].C*float64(x) + transformations[i].D*float64(y) + transformations[i].F*float64(img.Rect.Dy())))
+			newX = int(math.Round(transformations[i].A*float64(x) + transformations[i].B*float64(y) + transformations[i].E*float64(img.Rect.Dx())))
+			newY = int(math.Round(transformations[i].C*float64(x) + transformations[i].D*float64(y) + transformations[i].F*float64(img.Rect.Dy())))
 			imgCopy.SetGray(newX, newY, grayValue)
 		}
 	}
