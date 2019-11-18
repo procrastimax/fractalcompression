@@ -151,7 +151,10 @@ func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
 
 	// make deep copy of passed image
 	imgCopy := image.NewGray(image.Rect(0, 0, tileCount, tileCount))
-	imgCopy = img
+
+	for i := range imgCopy.Pix {
+		imgCopy.Pix[i] = 0
+	}
 
 	//pixelBox is the value of pixel inside a tile on the original image
 	pixelCount := img.Stride / imgCopy.Stride
@@ -177,5 +180,21 @@ func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
 		grayValue.Y = uint8(grayInt / (pixelCount * pixelCount))
 		imgCopy.SetGray(x, y, grayValue)
 	}
+	return imgCopy
+}
+
+//ScaleImage2 scales via an ifs
+//is ok for minimal scaling, but doesnt do well on more extreme scalings
+func ScaleImage2(img *image.Gray, scalingFactor float64) *image.Gray {
+	var transformation = Transformation{
+		A: 1.0 * scalingFactor,
+		B: 0.0,
+		C: 0.0,
+		D: 1.0 * scalingFactor,
+		E: 0.0,
+		F: 0.0,
+	}
+	img = applyIFSToImage(img, []Transformation{transformation})
+	img.Rect = image.Rect(0, 0, int(float64(img.Bounds().Dx())*scalingFactor), int(float64(img.Bounds().Dy())*scalingFactor))
 	return img
 }

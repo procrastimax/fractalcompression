@@ -29,7 +29,7 @@ func applyIFSToImage(img *image.Gray, transformations []Transformation) *image.G
 	//create deep copy of img
 	imgCopy := image.NewGray(img.Rect)
 	for i := 0; i < len(imgCopy.Pix); i++ {
-		imgCopy.Pix[i] = 255
+		imgCopy.Pix[i] = 0
 	}
 	var x = 0
 	var y = 0
