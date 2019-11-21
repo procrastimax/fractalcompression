@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/color"
 	"log"
+	"math"
 )
 
 // TransformImage applies one of 8 transformations to the image
@@ -197,4 +198,44 @@ func ScaleImage2(img *image.Gray, scalingFactor float64) *image.Gray {
 	img = applyIFSToImage(img, []Transformation{transformation})
 	img.Rect = image.Rect(0, 0, int(float64(img.Bounds().Dx())*scalingFactor), int(float64(img.Bounds().Dy())*scalingFactor))
 	return img
+}
+
+//CalcSquarredEuclideanDistance calculates the euclidean distance between a range and a domain block
+func CalcSquarredEuclideanDistance(rangeBlock *image.Gray, domainBlock *image.Gray) float64 {
+	s, g := calcContrastAndBrightness(rangeBlock, domainBlock)
+	var errorValue = 0.0
+	for i := range rangeBlock.Pix {
+		errorValue += math.Pow((s*float64(domainBlock.Pix[i])+g)-float64(rangeBlock.Pix[i]), 2.0)
+	}
+	return errorValue
+}
+
+//calcContrast using this function: http://einstein.informatik.uni-oldenburg.de/rechnernetze/fraktal.htm
+func calcContrastAndBrightness(rangeBlock *image.Gray, domainBlock *image.Gray) (float64, float64) {
+	//calculating s - contrast
+	var n = len(rangeBlock.Pix)
+	var numeratorS = 0.0
+
+	var multRD = 0
+	var sumR = 0
+	var sumD = 0
+	var sumD2 = 0
+	for i := range rangeBlock.Pix {
+		multRD += int(rangeBlock.Pix[i] * domainBlock.Pix[i])
+		sumR += int(rangeBlock.Pix[i])
+		sumD += int(domainBlock.Pix[i])
+		sumD2 += int(math.Pow(float64(domainBlock.Pix[i]), 2.0))
+	}
+
+	numeratorS = (math.Pow(float64(n), 2.0) * float64(multRD)) - float64(sumR*sumD)
+
+	var denominatorS float64 = (math.Pow(float64(n), 2.0) * float64(sumD2)) - math.Pow(float64(sumD), 2.0)
+	var contrast = (numeratorS / denominatorS)
+
+	//calculating g - brightness
+	var numeratorO = float64(sumR) - (contrast * float64(sumD))
+	var denominatorO = math.Pow(float64(n), 2.0)
+	var brightness = numeratorO / denominatorO
+
+	return contrast, brightness
 }
