@@ -7,6 +7,9 @@ import (
 	"os"
 )
 
+const RangeBlock = 4
+const DomainBlock = 8
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatalln("Please specify an imagepath!")
@@ -22,25 +25,26 @@ func main() {
 
 	fmt.Println("Image successfully turned gray...")
 
-	//grayImg = imagetools.CreateFractalFromImage(grayImg, 1, []imagetools.Transformation{transformation1, transformation2, transformation3})
-
 	fmt.Println("Creating range and domain arrays...")
-	ranges := imagetools.DivideImage(grayImg, 4)
-	domains := imagetools.DivideImage(grayImg, 8)
-
-	//fmt.Println(domains[10][0])
+	ranges := imagetools.DivideImage(grayImg, RangeBlock)
+	domains := imagetools.DivideImage(grayImg, DomainBlock)
 
 	fmt.Println("Scale down all domains to range-block size...")
 	for i := range domains {
 		for _, value := range domains[i] {
-			*value = *imagetools.ScaleImage(value, 0.5)
+			*value = *imagetools.ScaleImage(value, float64(float64(RangeBlock)/float64(DomainBlock)))
 		}
 	}
 
 	fmt.Println("Finding best matching domain...")
-	fmt.Println(imagetools.FindBestMatchingDomains(ranges, domains))
-	//imagetools.SaveImageToFile(imagetools.TransformImage(domains[10][0], 0), filename)
-	//fmt.Println("Image successfully saved...")
+	encoding := imagetools.FindBestMatchingDomains(ranges, domains)
+
+	fmt.Println("Decompress Image...")
+	encodedImage := imagetools.Decompress(encoding, 4000)
+
+	//imagetools.SaveImageToFile(grayImg, filename)
+	imagetools.SaveImageToFile(encodedImage, filename)
+	fmt.Println("Image successfully saved...")
 }
 
 //Sierpinski Triangle
