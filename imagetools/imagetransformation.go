@@ -197,7 +197,7 @@ func GrayTransformImage(img *image.Gray, s float64, g float64) *image.Gray {
 
 //ScaleImage2 scales via an ifs
 //is ok for minimal scaling, but doesnt do well on more extreme scalings
-/*func ScaleImage2(img *image.Gray, scalingFactor float64) *image.Gray {
+func ScaleImage2(img *image.Gray, scalingFactor float64) *image.Gray {
 	var transformation = Transformation{
 		A: 1.0 * scalingFactor,
 		B: 0.0,
@@ -209,7 +209,7 @@ func GrayTransformImage(img *image.Gray, s float64, g float64) *image.Gray {
 	img = applyIFSToImage(img, []Transformation{transformation})
 	img.Rect = image.Rect(0, 0, int(float64(img.Bounds().Dx())*scalingFactor), int(float64(img.Bounds().Dy())*scalingFactor))
 	return img
-}*/
+}
 
 //CalcSquarredEuclideanDistance calculates the euclidean distance between a range and a domain block
 // it returns the euclidean distance, and the parameters s and g
