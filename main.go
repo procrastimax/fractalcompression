@@ -22,23 +22,25 @@ func main() {
 
 	fmt.Println("Image successfully turned gray...")
 
-	grayImg = imagetools.ScaleImage(grayImg, 0.2)
-	//grayImg = imagetools.TransformImage(grayImg, 7)
 	//grayImg = imagetools.CreateFractalFromImage(grayImg, 1, []imagetools.Transformation{transformation1, transformation2, transformation3})
 
-	//fmt.Println("Creating range and domain arrays...")
-	//ranges := imagetools.DivideImage(grayImg, 4)
-	//domains := imagetools.DivideImage(grayImg, 8)
+	fmt.Println("Creating range and domain arrays...")
+	ranges := imagetools.DivideImage(grayImg, 4)
+	domains := imagetools.DivideImage(grayImg, 8)
 
-	/*fmt.Println("Scale down all domains to range-block size...")
+	//fmt.Println(domains[10][0])
+
+	fmt.Println("Scale down all domains to range-block size...")
 	for i := range domains {
 		for _, value := range domains[i] {
-			value = imagetools.ScaleImage(value, 0.5)
+			*value = *imagetools.ScaleImage(value, 0.5)
 		}
-	}*/
+	}
 
-	imagetools.SaveImageToFile(grayImg, filename)
-	fmt.Println("Image successfully saved...")
+	fmt.Println("Finding best matching domain...")
+	fmt.Println(imagetools.FindBestMatchingDomains(ranges, domains))
+	//imagetools.SaveImageToFile(imagetools.TransformImage(domains[10][0], 0), filename)
+	//fmt.Println("Image successfully saved...")
 }
 
 //Sierpinski Triangle

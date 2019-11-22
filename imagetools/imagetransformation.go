@@ -130,8 +130,12 @@ func DivideImage(img *image.Gray, pixelSize int) [][]*image.Gray {
 	for i := 0; i < dividedCount; i++ {
 		imageParts[i] = make([]*image.Gray, dividedCount)
 		for j := 0; j < dividedCount; j++ {
-			rect := image.Rect(i*pixelSize, j*pixelSize, (pixelSize*i)+pixelSize, (pixelSize*j)+pixelSize)
-			imageParts[i][j] = img.SubImage(rect).(*image.Gray)
+			rect := image.Rect(0, 0, pixelSize, pixelSize)
+			imageParts[i][j] = image.NewGray(rect)
+			for c := range imageParts[i][j].Pix {
+				grayValue := img.GrayAt(i*pixelSize+c, j*pixelSize+c)
+				imageParts[i][j].Pix[c] = grayValue.Y
+			}
 		}
 	}
 	return imageParts
@@ -176,7 +180,6 @@ func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
 				grayInt += int(img.GrayAt((pixelCount*x)+a, (pixelCount*y)+b).Y)
 			}
 		}
-
 		//average grayValue
 		grayValue.Y = uint8(grayInt / (pixelCount * pixelCount))
 		imgCopy.SetGray(x, y, grayValue)
@@ -186,7 +189,7 @@ func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
 
 //ScaleImage2 scales via an ifs
 //is ok for minimal scaling, but doesnt do well on more extreme scalings
-func ScaleImage2(img *image.Gray, scalingFactor float64) *image.Gray {
+/*func ScaleImage2(img *image.Gray, scalingFactor float64) *image.Gray {
 	var transformation = Transformation{
 		A: 1.0 * scalingFactor,
 		B: 0.0,
@@ -198,44 +201,50 @@ func ScaleImage2(img *image.Gray, scalingFactor float64) *image.Gray {
 	img = applyIFSToImage(img, []Transformation{transformation})
 	img.Rect = image.Rect(0, 0, int(float64(img.Bounds().Dx())*scalingFactor), int(float64(img.Bounds().Dy())*scalingFactor))
 	return img
-}
+}*/
 
 //CalcSquarredEuclideanDistance calculates the euclidean distance between a range and a domain block
-func CalcSquarredEuclideanDistance(rangeBlock *image.Gray, domainBlock *image.Gray) float64 {
+// it returns the euclidean distance, and the parameters s and g
+func CalcSquarredEuclideanDistance(rangeBlock *image.Gray, domainBlock *image.Gray) (float64, float64, float64) {
 	s, g := calcContrastAndBrightness(rangeBlock, domainBlock)
 	var errorValue = 0.0
 	for i := range rangeBlock.Pix {
 		errorValue += math.Pow((s*float64(domainBlock.Pix[i])+g)-float64(rangeBlock.Pix[i]), 2.0)
 	}
-	return errorValue
+	return errorValue, s, g
 }
 
 //calcContrast using this function: http://einstein.informatik.uni-oldenburg.de/rechnernetze/fraktal.htm
 func calcContrastAndBrightness(rangeBlock *image.Gray, domainBlock *image.Gray) (float64, float64) {
 	//calculating s - contrast
-	var n = len(rangeBlock.Pix)
+	var n = float64(len(rangeBlock.Pix))
 	var numeratorS = 0.0
 
-	var multRD = 0
-	var sumR = 0
-	var sumD = 0
-	var sumD2 = 0
+	var multRD = 0.0
+	var sumR = 0.0
+	var sumD = 0.0
+	var sumD2 = 0.0
 	for i := range rangeBlock.Pix {
-		multRD += int(rangeBlock.Pix[i] * domainBlock.Pix[i])
-		sumR += int(rangeBlock.Pix[i])
-		sumD += int(domainBlock.Pix[i])
-		sumD2 += int(math.Pow(float64(domainBlock.Pix[i]), 2.0))
+		multRD += float64(rangeBlock.Pix[i] * domainBlock.Pix[i])
+		sumR += float64(rangeBlock.Pix[i])
+		sumD += float64(domainBlock.Pix[i])
+		sumD2 += math.Pow(float64(domainBlock.Pix[i]), 2.0)
 	}
 
-	numeratorS = (math.Pow(float64(n), 2.0) * float64(multRD)) - float64(sumR*sumD)
+	//fmt.Println(n, multRD, sumR, sumD, sumD2)
 
-	var denominatorS float64 = (math.Pow(float64(n), 2.0) * float64(sumD2)) - math.Pow(float64(sumD), 2.0)
+	numeratorS = ((n * n) * float64(multRD)) - float64(sumR*sumD)
+	//fmt.Println("numeratorS " + strconv.FormatFloat(numeratorS, 'f', 5, 64))
+
+	var denominatorS float64 = (n * n * float64(sumD2)) - math.Pow(float64(sumD), 2.0)
+
+	//fmt.Println("denominatorS " + strconv.FormatFloat(denominatorS, 'f', 5, 64))
 	var contrast = (numeratorS / denominatorS)
 
 	//calculating g - brightness
 	var numeratorO = float64(sumR) - (contrast * float64(sumD))
 	var denominatorO = math.Pow(float64(n), 2.0)
 	var brightness = numeratorO / denominatorO
-
+	//fmt.Println("contrast, brightness "+strconv.FormatFloat(contrast, 'f', 5, 64), strconv.FormatFloat(brightness, 'f', 5, 64))
 	return contrast, brightness
 }
