@@ -16,13 +16,13 @@ import (
 // 5 - Flip at x axis
 // 6 - Mirror at y=x
 // 7 - Mirror at y=-x
-func TransformImage(img *image.Gray, rotationType uint8) *image.Gray {
-	if rotationType < 0 || rotationType > 7 {
+func TransformImage(img *image.Gray, transformationType uint8) *image.Gray {
+	if transformationType < 0 || transformationType > 7 {
 		log.Fatalln("Transform type can only be a number between 0 and 3 representing 4 rotations (0,90,180,270)!")
 	}
 	var transformation Transformation
 
-	switch rotationType {
+	switch transformationType {
 	case 0:
 		//is identity, we can return the given image
 		{
@@ -185,6 +185,14 @@ func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
 		imgCopy.SetGray(x, y, grayValue)
 	}
 	return imgCopy
+}
+
+//GrayTransformImage applies contrast and brightness transformation to image
+func GrayTransformImage(img *image.Gray, s float64, g float64) *image.Gray {
+	for i := range img.Pix {
+		img.Pix[i] = uint8((s*1.5)*float64(img.Pix[i]) + (g * 20))
+	}
+	return img
 }
 
 //ScaleImage2 scales via an ifs
