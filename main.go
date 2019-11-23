@@ -16,7 +16,7 @@ func main() {
 	}
 	filename := os.Args[1]
 
-	fmt.Println("Loading image and convert to fractal...")
+	fmt.Println("Loading image...")
 	img := imagetools.LoadImageFromFile(filename)
 
 	fmt.Println("Loading successfull...")
@@ -32,7 +32,7 @@ func main() {
 	fmt.Println("Scale down all domains to range-block size...")
 	for i := range domains {
 		for _, value := range domains[i] {
-			*value = *imagetools.ScaleImage(value, float64(DomainBlock/RangeBlock))
+			*value = *imagetools.ScaleImage(value, float64(float64(RangeBlock)/float64(DomainBlock)))
 		}
 	}
 
