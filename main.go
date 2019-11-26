@@ -2,13 +2,9 @@ package main
 
 import (
 	"fmt"
-	"fractalcompression/imagetools"
 	"log"
 	"os"
 )
-
-const RangeBlock = 4
-const DomainBlock = 8
 
 func main() {
 	if len(os.Args) < 2 {
@@ -17,38 +13,20 @@ func main() {
 	filename := os.Args[1]
 
 	fmt.Println("Loading image...")
-	img := imagetools.LoadImageFromFile(filename)
-
+	img := LoadImageFromFile(filename)
 	fmt.Println("Loading successfull...")
+	grayImg := ImageToGray(img)
 
-	grayImg := imagetools.ImageToGray(img)
+	encodingParams := EncodeImage(grayImg)
 
-	fmt.Println("Image successfully turned gray...")
+	*grayImg = *DecodeImage(encodingParams, 4, 10)
 
-	fmt.Println("Creating range and domain arrays...")
-	ranges := imagetools.DivideImage(grayImg, RangeBlock)
-	domains := imagetools.DivideImage(grayImg, DomainBlock)
-
-	fmt.Println("Scale down all domains to range-block size...")
-	for i := range domains {
-		for _, value := range domains[i] {
-			*value = *imagetools.ScaleImage(value, float64(float64(RangeBlock)/float64(DomainBlock)))
-		}
-	}
-
-	fmt.Println("Finding best matching domain...")
-	encoding := imagetools.FindBestMatchingDomains(ranges, domains)
-
-	fmt.Println("Decompress Image...")
-	encodedImage := imagetools.Decompress(encoding, 4000)
-
-	//imagetools.SaveImageToFile(grayImg, filename)
-	imagetools.SaveImageToFile(encodedImage, filename)
-	fmt.Println("Image successfully saved...")
+	fmt.Println("Saving image...")
+	SaveImageToFile(grayImg, filename)
 }
 
 //Sierpinski Triangle
-var transformation1 = imagetools.Transformation{
+var transformation1 = Transformation{
 	A: 0.5,
 	B: 0,
 	C: 0,
@@ -57,7 +35,7 @@ var transformation1 = imagetools.Transformation{
 	F: 0,
 }
 
-var transformation2 = imagetools.Transformation{
+var transformation2 = Transformation{
 	A: 0.5,
 	B: 0,
 	C: 0,
@@ -66,7 +44,7 @@ var transformation2 = imagetools.Transformation{
 	F: 0,
 }
 
-var transformation3 = imagetools.Transformation{
+var transformation3 = Transformation{
 	A: 0.5,
 	B: 0,
 	C: 0,
@@ -74,40 +52,3 @@ var transformation3 = imagetools.Transformation{
 	E: 0,
 	F: 0.5,
 }
-
-// Cube creation
-/*var transformation1 = imagetools.Transformation{
-	A: 0.5,
-	B: 0,
-	C: 0,
-	D: 0.5,
-	E: 0,
-	F: 0,
-}
-
-var transformation2 = imagetools.Transformation{
-	A: 0.5,
-	B: 0,
-	C: 0,
-	D: 0.5,
-	E: 0,
-	F: 0.5,
-}
-
-var transformation3 = imagetools.Transformation{
-	A: 0.5,
-	B: 0,
-	C: 0,
-	D: 0.5,
-	E: 0.5,
-	F: 0,
-}
-
-var transformation4 = imagetools.Transformation{
-	A: 0.5,
-	B: 0,
-	C: 0,
-	D: 0.5,
-	E: 0.5,
-	F: 0.5,
-}*/
