@@ -5,6 +5,9 @@ import "image"
 //DecodeImage .
 func DecodeImage(encoding [][]EncodingParams, rangePixelSize, iterations int) *GrayImage {
 	var img = NewGrayImage(image.Rect(0, 0, len(encoding)*rangePixelSize, len(encoding[0])*rangePixelSize))
+	for i := range img.Pix {
+		img.Pix[i] = 255
+	}
 	for it := 0; it < iterations; it++ {
 		applyEncodings(encoding, img, rangePixelSize)
 	}

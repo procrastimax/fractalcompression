@@ -11,6 +11,7 @@ type EncodingParams struct {
 	G  uint8
 	Dx int
 	Dy int
+	T  uint8
 }
 
 //EncodeImage encodes the image and returns encoding params as a 2D array
@@ -37,17 +38,35 @@ func findBestMatchingDomains(rangeBlocks [][]*GrayImage, domainBlocks [][]*GrayI
 		encodings[ry] = make([]EncodingParams, len(rangeBlocks[ry]))
 		for rx := range rangeBlocks[ry] {
 			errorValue := math.MaxFloat64
+
+		domains:
 			//iterate over all domain blocks
 			for dy := range domainBlocks {
 				for dx := range domainBlocks[dy] {
-					for sIT, s := range Sarr {
-						tempImg := domainBlocks[dy][dx].GrayTransformImage(s, 0)
+					for i := 0; i < 8; i++ {
+						tempImg := domainBlocks[dy][dx]
+						copy(tempImg.Pix, domainBlocks[dy][dx].Pix)
+						tempImg.TransformImage(uint8(i))
 						tempVal := CalcSquarredEuclideanDistance(rangeBlocks[ry][rx], tempImg)
-						if tempVal < errorValue {
+
+						if tempVal <= 0.001 {
+							encodings[ry][rx] = EncodingParams{
+								S:  1,
+								G:  0,
+								T:  uint8(i),
+								Dx: dx,
+								Dy: dy,
+							}
+							break domains
+
+							//only check for optimal s and g if the value is already somehow low
+						} else if tempVal < errorValue {
+							tempVal = CalcSquarredEuclideanDistance(rangeBlocks[ry][rx], domainBlocks[dy][dx])
 							errorValue = tempVal
 							encodings[ry][rx] = EncodingParams{
-								S:  uint8(sIT),
-								G:  0,
+								S:  uint8(1),
+								G:  uint8(0),
+								T:  uint8(i),
 								Dx: dx,
 								Dy: dy,
 							}

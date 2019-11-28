@@ -21,11 +21,10 @@ func CalcSquarredEuclideanDistance(rangeBlock *GrayImage, domainBlock *GrayImage
 	var errorValue = 0.0
 
 	rBounds := rangeBlock.Bounds()
-	dBounds := domainBlock.Bounds()
-	for y := rBounds.Min.Y; y < rBounds.Max.Y; y++ {
-		for x := rBounds.Min.X; x < rBounds.Max.X; x++ {
+	for y := 0; y < rBounds.Dy(); y++ {
+		for x := 0; x < rBounds.Dy(); x++ {
 			//fmt.Println(rangeBlock.Bounds(), domainBlock.Bounds(), x, y, x-rBounds.Min.X+dBounds.Min.X, y-rBounds.Min.Y+dBounds.Min.Y)
-			errorValue += math.Pow(float64(domainBlock.GrayAt(x-rBounds.Min.X+dBounds.Min.X, y-rBounds.Min.Y+dBounds.Min.Y)-rangeBlock.GrayAt(x, y)), 2.0)
+			errorValue += math.Pow(float64(domainBlock.GrayAtRelative(x, y)-rangeBlock.GrayAtRelative(x, y)), 2.0)
 		}
 	}
 	return math.Sqrt(errorValue)

@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/jpeg"
+	_ "image/jpeg"
+	"image/png"
 	"log"
 	"os"
 	"path/filepath"
@@ -34,8 +35,8 @@ func LoadImageFromFile(filename string) *image.Image {
 	return &img
 }
 
-// SaveImageToFile saves a i*mg.Gray pointer to the specified filename with the *_edited* filepostix
-func SaveImageToFile(img *GrayImage, filename string) {
+// SaveImageToFileAsPNG saves a i*mg.Gray pointer to the specified filename with the *_edited* filepostix
+func SaveImageToFileAsPNG(img *GrayImage, filename string) {
 	if len(strings.TrimSpace(filename)) == 0 {
 		log.Fatalln("Image path shall not be null or empty!")
 	}
@@ -45,7 +46,7 @@ func SaveImageToFile(img *GrayImage, filename string) {
 	fg, err := os.Create(newImagePath)
 	defer fg.Close()
 	check(err)
-	err = jpeg.Encode(fg, img, nil)
+	err = png.Encode(fg, img)
 	check(err)
 }
 

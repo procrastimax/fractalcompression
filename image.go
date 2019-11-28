@@ -47,6 +47,12 @@ func (img *GrayImage) GrayAt(x, y int) uint8 {
 	return 0
 }
 
+//GrayAtRelative returns the grayvalue as an uint8 values at x,y which are relative values,
+//so the first pixel would x = 0, y = 0
+func (img *GrayImage) GrayAtRelative(x, y int) uint8 {
+	return img.Pix[img.PixOffset(x+img.Rect.Min.X, y+img.Rect.Min.Y)]
+}
+
 //ColorModel returns the image's color model
 func (img *GrayImage) ColorModel() color.Model {
 	return color.GrayModel
@@ -82,7 +88,23 @@ func (img *GrayImage) SetGrayAt(x, y int, grayValue uint8) {
 	img.Pix[i] = grayValue
 }
 
-//PixOffset returns the idnex of the first element of Pix that corresponds to the pixel at (x,y)
+//SetGrayAtRelative sets the gray value at relative pixel x,y, the first pixel would be x = 0, y = 0
+func (img *GrayImage) SetGrayAtRelative(x, y int, grayvalue uint8) {
+	xRel := x + img.Bounds().Min.X - 1
+	yRel := y + img.Bounds().Min.Y
+	if img.Rect.Min.X < x ||
+		img.Rect.Max.X >= x ||
+		img.Rect.Min.Y <= y ||
+		img.Rect.Max.Y > y {
+		fmt.Println(img.Rect.String() + " - P: " + image.Point{xRel, yRel}.String() + " ")
+		log.Fatalln("SetGrayAtRelative: Trying to set pixel value which is outside of the boundaries!")
+		return
+	}
+	i := img.PixOffset(xRel, yRel)
+	img.Pix[i] = grayvalue
+}
+
+//PixOffset returns the index of the first element of Pix that corresponds to the pixel at (x,y)
 func (img *GrayImage) PixOffset(x, y int) int {
 	return (y-img.Rect.Min.Y)*img.Stride + (x - img.Rect.Min.X)
 }
@@ -134,13 +156,12 @@ func (img *GrayImage) applyTransformationToGrayImage(transformation Transformati
 	copy(pixCopy, img.Pix)
 
 	b := img.Bounds()
-	w, h := img.Rect.Dx(), img.Rect.Dy()
-	for y := b.Min.Y; y < b.Max.Y; y++ {
-		for x := b.Min.X; x < b.Max.X; x++ {
+	for y := 0; y < b.Dy(); y++ {
+		for x := 0; x < b.Dx(); x++ {
 			grayValue := pixCopy[img.PixOffset(x, y)]
-			newX := int(math.Round(transformation.A*float64(x) + transformation.B*float64(y) + transformation.E*float64(w)))
-			newY := int(math.Round(transformation.C*float64(x) + transformation.D*float64(y) + transformation.F*float64(h)))
-			img.SetGrayAt(newX, newY, grayValue)
+			newX := int(math.Round(transformation.A*float64(x) + transformation.B*float64(y) + transformation.E*float64(b.Size().X)))
+			newY := int(math.Round(transformation.C*float64(x) + transformation.D*float64(y) + transformation.F*float64(b.Size().Y)))
+			img.SetGrayAtRelative(newX, newY, grayValue)
 		}
 	}
 }
@@ -338,7 +359,7 @@ func (img *GrayImage) GrayTransformImage(s float64, g float64) *GrayImage {
 	return imgCopy
 }
 
-//GrayTransformImage applies contrast and brightness transformation to image
+//GrayTransformImageInPlace applies contrast and brightness transformation to image
 func (img *GrayImage) GrayTransformImageInPlace(s float64, g float64) {
 
 	b := img.Bounds()

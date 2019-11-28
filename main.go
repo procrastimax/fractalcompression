@@ -17,12 +17,15 @@ func main() {
 	fmt.Println("Loading successfull...")
 	grayImg := ImageToGray(img)
 
-	encodingParams := EncodeImage(grayImg)
+	//domains := grayImg.DivideImage(8)
+	//domains[1][1].SetGrayAtRelative(2, 2, 23)
+	//fmt.Println(domains[1][1].GrayAtRelative(2, 2))
 
+	encodingParams := EncodeImage(grayImg)
 	*grayImg = *DecodeImage(encodingParams, 4, 10)
 
 	fmt.Println("Saving image...")
-	SaveImageToFile(grayImg, filename)
+	SaveImageToFileAsPNG(grayImg, filename)
 }
 
 //Sierpinski Triangle
