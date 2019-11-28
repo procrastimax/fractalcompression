@@ -190,7 +190,14 @@ func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
 //GrayTransformImage applies contrast and brightness transformation to image
 func GrayTransformImage(img *image.Gray, s float64, g float64) *image.Gray {
 	for i := range img.Pix {
-		img.Pix[i] = uint8((s*1.5)*float64(img.Pix[i]) + (g * 20))
+		grayValue := int((s*1.5)*float64(img.Pix[i]) + (g * 20))
+		if grayValue < 0 {
+			img.Pix[i] = 0
+		} else if grayValue > 255 {
+			img.Pix[i] = 255
+		} else {
+			img.Pix[i] = uint8(grayValue)
+		}
 	}
 	return img
 }

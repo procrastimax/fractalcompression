@@ -40,7 +40,7 @@ func main() {
 	encoding := imagetools.FindBestMatchingDomains(ranges, domains)
 
 	fmt.Println("Decompress Image...")
-	encodedImage := imagetools.Decompress(encoding, 4000)
+	encodedImage := imagetools.Decompress(encoding, 1)
 
 	//imagetools.SaveImageToFile(grayImg, filename)
 	imagetools.SaveImageToFile(encodedImage, filename)
