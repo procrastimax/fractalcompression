@@ -47,6 +47,21 @@ func (img *GrayImage) GrayAt(x, y int) uint8 {
 	return 0
 }
 
+//GrayAtRelative returns the grayvalue as an uint8 values at x,y which are relative values,
+//so the first pixel would x = 0, y = 0
+func (img *GrayImage) GrayAtRelative(x, y int) uint8 {
+	xRel := x + img.Bounds().Min.X
+	yRel := y + img.Bounds().Min.Y
+	if img.Rect.Min.X <= xRel ||
+		img.Rect.Max.X > xRel ||
+		img.Rect.Min.Y <= yRel ||
+		img.Rect.Max.Y > yRel {
+		return img.Pix[(yRel-img.Rect.Min.Y)*img.Stride+xRel-(img.Rect.Min.X)]
+	}
+	fmt.Println("GrayAt: Trying to get pixel value which is outside of the boundaries!")
+	return 0
+}
+
 //ColorModel returns the image's color model
 func (img *GrayImage) ColorModel() color.Model {
 	return color.GrayModel
@@ -82,7 +97,20 @@ func (img *GrayImage) SetGrayAt(x, y int, grayValue uint8) {
 	img.Pix[i] = grayValue
 }
 
-//PixOffset returns the idnex of the first element of Pix that corresponds to the pixel at (x,y)
+//SetGrayAtRelative sets the gray value at relative pixel x,y, the first pixel would be x = 0, y = 0
+func (img *GrayImage) SetGrayAtRelative(x, y int, grayvalue uint8) {
+	xRel := x + img.Bounds().Min.X
+	yRel := y + img.Bounds().Min.Y
+	if !(image.Point{xRel, yRel}.In(img.Rect)) {
+		fmt.Println(img.Rect.String() + " - P: " + image.Point{xRel, yRel}.String() + " ")
+		log.Fatalln("SetGrayAtRelative: Trying to set pixel value which is outside of the boundaries!")
+		return
+	}
+	i := img.PixOffset(xRel, yRel)
+	img.Pix[i] = grayvalue
+}
+
+//PixOffset returns the index of the first element of Pix that corresponds to the pixel at (x,y)
 func (img *GrayImage) PixOffset(x, y int) int {
 	return (y-img.Rect.Min.Y)*img.Stride + (x - img.Rect.Min.X)
 }
@@ -338,7 +366,7 @@ func (img *GrayImage) GrayTransformImage(s float64, g float64) *GrayImage {
 	return imgCopy
 }
 
-//GrayTransformImage applies contrast and brightness transformation to image
+//GrayTransformImageInPlace applies contrast and brightness transformation to image
 func (img *GrayImage) GrayTransformImageInPlace(s float64, g float64) {
 
 	b := img.Bounds()
