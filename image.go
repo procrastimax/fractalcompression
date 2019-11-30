@@ -50,7 +50,17 @@ func (img *GrayImage) GrayAt(x, y int) uint8 {
 //GrayAtRelative returns the grayvalue as an uint8 values at x,y which are relative values,
 //so the first pixel would x = 0, y = 0
 func (img *GrayImage) GrayAtRelative(x, y int) uint8 {
-	return img.Pix[img.PixOffset(x+img.Rect.Min.X, y+img.Rect.Min.Y)]
+
+	xRel := x + img.Bounds().Min.X
+	yRel := y + img.Bounds().Min.Y
+	if img.Rect.Min.X <= xRel ||
+		img.Rect.Max.X > xRel ||
+		img.Rect.Min.Y <= yRel ||
+		img.Rect.Max.Y > yRel {
+		return img.Pix[(yRel-img.Rect.Min.Y)*img.Stride+xRel-(img.Rect.Min.X)]
+	}
+	fmt.Println("GrayAt: Trying to get pixel value which is outside of the boundaries!")
+	return 0
 }
 
 //ColorModel returns the image's color model
@@ -90,12 +100,10 @@ func (img *GrayImage) SetGrayAt(x, y int, grayValue uint8) {
 
 //SetGrayAtRelative sets the gray value at relative pixel x,y, the first pixel would be x = 0, y = 0
 func (img *GrayImage) SetGrayAtRelative(x, y int, grayvalue uint8) {
-	xRel := x + img.Bounds().Min.X - 1
+
+	xRel := x + img.Bounds().Min.X
 	yRel := y + img.Bounds().Min.Y
-	if img.Rect.Min.X < x ||
-		img.Rect.Max.X >= x ||
-		img.Rect.Min.Y <= y ||
-		img.Rect.Max.Y > y {
+	if !(image.Point{xRel, yRel}.In(img.Rect)) {
 		fmt.Println(img.Rect.String() + " - P: " + image.Point{xRel, yRel}.String() + " ")
 		log.Fatalln("SetGrayAtRelative: Trying to set pixel value which is outside of the boundaries!")
 		return
