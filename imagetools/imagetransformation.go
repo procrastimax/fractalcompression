@@ -190,7 +190,7 @@ func ScaleImage(img *image.Gray, scalingFactor float64) *image.Gray {
 //GrayTransformImage applies contrast and brightness transformation to image
 func GrayTransformImage(img *image.Gray, s float64, g float64) *image.Gray {
 	for i := range img.Pix {
-		grayValue := int((s*1.5)*float64(img.Pix[i]) + (g * 20))
+		grayValue := int((s*1.0)*float64(img.Pix[i]) + (g * 20))
 		if grayValue < 0 {
 			img.Pix[i] = 0
 		} else if grayValue > 255 {
@@ -220,17 +220,16 @@ func ScaleImage2(img *image.Gray, scalingFactor float64) *image.Gray {
 
 //CalcSquarredEuclideanDistance calculates the euclidean distance between a range and a domain block
 // it returns the euclidean distance, and the parameters s and g
-func CalcSquarredEuclideanDistance(rangeBlock *image.Gray, domainBlock *image.Gray) (float64, float64, float64) {
-	s, g := calcContrastAndBrightness(rangeBlock, domainBlock)
+func CalcSquarredEuclideanDistance(rangeBlock *image.Gray, domainBlock *image.Gray) float64 {
 	var errorValue = 0.0
 	for i := range rangeBlock.Pix {
-		errorValue += math.Pow((s*float64(domainBlock.Pix[i])+g)-float64(rangeBlock.Pix[i]), 2.0)
+		errorValue += math.Pow((float64(domainBlock.Pix[i]))-float64(rangeBlock.Pix[i]), 2.0)
 	}
-	return errorValue, s, g
+	return errorValue
 }
 
-//calcContrast using this function: http://einstein.informatik.uni-oldenburg.de/rechnernetze/fraktal.htm
-func calcContrastAndBrightness(rangeBlock *image.Gray, domainBlock *image.Gray) (float64, float64) {
+//CalcContrastAndBrightness using this function: http://einstein.informatik.uni-oldenburg.de/rechnernetze/fraktal.htm
+func CalcContrastAndBrightness(rangeBlock *image.Gray, domainBlock *image.Gray) (float64, float64) {
 	//calculating s - contrast
 	var n = float64(len(rangeBlock.Pix))
 	var numeratorS = 0.0
